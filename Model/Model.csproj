@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>PaymentCalculation.Model</AssemblyName>
+    <RootNamespace>PaymentCalculation.Model</RootNamespace>
+  </PropertyGroup>
+
+</Project>
