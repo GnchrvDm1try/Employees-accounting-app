@@ -1,4 +1,6 @@
 ﻿using System;
+using PaymentCalculation.Model;
+using PaymentCalculation.Resources;
 
 namespace PaymentCalculation.PaymentCalculationConsole
 {
