@@ -7,13 +7,11 @@ namespace PaymentCalculation.Model
     {
         public string FullName { get; set; }
         public string Position { get; set; }
-        public decimal Salary { get; set; }
 
-        public Person(string fullName, string position, decimal salary)
+        public Person(string fullName, string position)
         {
-            this.FullName = fullName;
-            this.Position = position;
-            this.Salary = salary;
+            FullName = fullName;
+            Position = position;
         }
     }
 }

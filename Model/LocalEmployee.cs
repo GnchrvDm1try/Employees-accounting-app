@@ -8,9 +8,10 @@ namespace PaymentCalculation.Model
 {
     class LocalEmployee : Person
     {
-        public LocalEmployee(string fullName, string position, decimal salary) : base(fullName, position, salary)
+        decimal Salary { get; set; }
+        public LocalEmployee(string fullName, string position, decimal salary) : base(fullName, position)
         {
-
+            Salary = salary;
         }
     }
 }

@@ -8,9 +8,10 @@ namespace PaymentCalculation.Model
 {
     public class Supervisor : Person
     {
-        public Supervisor(string fullName, string position, decimal salary) : base(fullName, position, salary)
+        decimal Salary { get; set; }
+        public Supervisor(string fullName, string position, decimal salary) : base(fullName, position)
         {
-
+            Salary = salary;
         }
 
         public void AddEmployee()
@@ -23,7 +24,7 @@ namespace PaymentCalculation.Model
 
         }
 
-        public void GetListOfEmployees(TimeSpan span)
+        public void GetListOfEmployees()
         {
 
         }
