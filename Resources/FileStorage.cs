@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PaymentCalculation.Resources
 {
@@ -31,21 +32,27 @@ namespace PaymentCalculation.Resources
             }
         }
 
-        public void AddWorker(Worker worker, decimal salary)
+        public void AddWorker(Worker worker)
         {
             switch(worker.Position)
             {
                 case "Supervisor":
-                    StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath);
-                    supervisorsWriter.WriteLine(worker.FullName + "," + salary);
+                    StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true);
+                    Supervisor supervisor = (Supervisor)worker;
+                    supervisorsWriter.WriteLine(supervisor.FullName + "," + supervisor.Salary);
+                    supervisorsWriter.Close();
                     break;
                 case "LocalEmployee":
-                    StreamWriter localEmployeesWriter = new StreamWriter(localEmployeeFilePath);
-                    localEmployeesWriter.WriteLine(worker.FullName + "," + salary);
+                    StreamWriter localEmployeesWriter = new StreamWriter(localEmployeeFilePath, true);
+                    LocalEmployee localEmployee = (LocalEmployee)worker;
+                    localEmployeesWriter.WriteLine(localEmployee.FullName + "," + localEmployee.Salary);
+                    localEmployeesWriter.Close();
                     break;
                 case "Freelancer":
-                    StreamWriter freelancersWriter = new StreamWriter(freelancerFilePath);
-                    freelancersWriter.WriteLine(worker.FullName + "," + salary);
+                    StreamWriter freelancersWriter = new StreamWriter(freelancerFilePath, true);
+                    Freelancer freelancer = (Freelancer)worker;
+                    freelancersWriter.WriteLine(freelancer.FullName + "," + freelancer.PaymentPerHour);
+                    freelancersWriter.Close();
                     break;
                 default:
                     throw new Exception("Wrong type of user!");
@@ -54,8 +61,9 @@ namespace PaymentCalculation.Resources
 
         public void AddWorkingSession(WorkingSession session)
         {
-            StreamWriter sessionWriter = new StreamWriter(workingSessionsFilePath);
+            StreamWriter sessionWriter = new StreamWriter(workingSessionsFilePath, true);
             sessionWriter.WriteLine(session.Name + "," + session.Date.Date + "," + session.Gap + "," + session.Comment);//???????????????????????????????????????
+            sessionWriter.Close();
         }
 
         public List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate, DateTime? toDate)
@@ -130,6 +138,7 @@ namespace PaymentCalculation.Resources
                         WorkingSession session = new WorkingSession(fullName, date, gap, comment);
                         workingSessions.Add(session);
                     }
+                    sessionReader.Close();
                 }
             }
             catch(Exception ex)

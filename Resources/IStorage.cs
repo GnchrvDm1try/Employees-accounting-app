@@ -11,7 +11,7 @@ namespace PaymentCalculation.Resources
     interface IStorage
     {
         void AddWorkingSession(WorkingSession session);
-        void AddWorker(Worker worker, decimal salary);
+        void AddWorker(Worker worker);
         List<WorkingSession> GetWorkingSessions(string? name, DateTime? fromDate, DateTime? toDate);
     }
 }
