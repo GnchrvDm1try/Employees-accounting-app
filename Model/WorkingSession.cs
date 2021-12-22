@@ -8,16 +8,16 @@ namespace PaymentCalculation.Model
 {
     public class WorkingSession
     {
-        DateTime Date { get; set; }
-        TimeSpan Span { get; set; }
-        string Name { get; set; }
-        string Comment { get; set; }
+        public string Name { get; }
+        public DateTime Date { get; }
+        public byte Gap { get; }
+        public string Comment { get; set; }
 
-        public WorkingSession(DateTime date, TimeSpan span, string name, string comment)
+        public WorkingSession(string name, DateTime date, byte gap, string comment)
         {
-            Date = date;
-            Span = span;
             Name = name;
+            Date = date;
+            Gap = gap;
             Comment = comment;
         }
     }

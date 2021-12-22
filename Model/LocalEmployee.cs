@@ -8,7 +8,7 @@ namespace PaymentCalculation.Model
 {
     class LocalEmployee : Worker
     {
-        decimal Salary { get; set; }
+        public decimal Salary { get; set; }
         public LocalEmployee(string fullName, string position, decimal salary) : base(fullName, position)
         {
             Salary = salary;
