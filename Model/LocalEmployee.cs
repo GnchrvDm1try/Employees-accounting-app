@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PaymentCalculation.Model
 {
-    class LocalEmployee : Person
+    class LocalEmployee : Worker
     {
         decimal Salary { get; set; }
         public LocalEmployee(string fullName, string position, decimal salary) : base(fullName, position)

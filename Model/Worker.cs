@@ -3,12 +3,12 @@
 namespace PaymentCalculation.Model
 {
 
-    public abstract class Person
+    public abstract class Worker
     {
         public string FullName { get; set; }
         public string Position { get; set; }
 
-        public Person(string fullName, string position)
+        public Worker(string fullName, string position)
         {
             FullName = fullName;
             Position = position;

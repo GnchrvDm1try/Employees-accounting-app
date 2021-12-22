@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PaymentCalculation.Model
 {
-    public class Freelancer : Person
+    public class Freelancer : Worker
     {
         decimal PaymentPerHour { get; set; }
         public Freelancer(string fullName, string position, decimal paymentPerHour) : base(fullName, position)
