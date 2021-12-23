@@ -20,5 +20,10 @@ namespace PaymentCalculation.Model
             Gap = gap;
             Comment = comment;
         }
+
+        public override string ToString()
+        {
+            return $"Name: {Name}\tDate: {Date.ToString("dd.MM.yyyy")}\tGap: {Gap}\tComment: {Comment}";
+        }
     }
 }

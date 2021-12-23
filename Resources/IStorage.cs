@@ -12,6 +12,6 @@ namespace PaymentCalculation.Resources
     {
         void AddWorkingSession(WorkingSession session);
         void AddWorker(Worker worker);
-        List<WorkingSession> GetWorkingSessions(string? name, DateTime? fromDate, DateTime? toDate);
+        List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate, DateTime? toDate);
     }
 }

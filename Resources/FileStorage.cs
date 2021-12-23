@@ -61,84 +61,88 @@ namespace PaymentCalculation.Resources
 
         public void AddWorkingSession(WorkingSession session)
         {
-            StreamWriter sessionWriter = new StreamWriter(workingSessionsFilePath, true);
-            sessionWriter.WriteLine(session.Name + "," + session.Date.Date + "," + session.Gap + "," + session.Comment);//???????????????????????????????????????
-            sessionWriter.Close();
+            using (StreamWriter sessionWriter = new StreamWriter(workingSessionsFilePath, true))
+            {
+                sessionWriter.WriteLine(session.Name + "," + session.Date.Date + "," + session.Gap + "," + session.Comment);//???????????????????????????????????????
+            }
         }
 
-        public List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate, DateTime? toDate)
+        public List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate = null, DateTime? toDate = null)
         {
             List<WorkingSession> workingSessions = new List<WorkingSession>();
             try
             {
                 if (fromDate != null && toDate != null)
                 {
-                    StreamReader sessionsReader = new StreamReader(workingSessionsFilePath);
-
-                    string line;
-                    string[] parameters;
-
-                    while ((line = sessionsReader.ReadLine()) != null)
+                    using (StreamReader sessionsReader = new StreamReader(workingSessionsFilePath))
                     {
-                        parameters = line.Split(',');
+                        string line;
+                        string[] parameters;
 
-                        string fullName = parameters[0];
-                        DateTime date = Convert.ToDateTime(parameters[1]);
-                        byte gap = Convert.ToByte(parameters[2]);
-                        string comment = parameters[3];
-
-                        if (fromDate <= date.Date && date.Date <= toDate)
+                        while ((line = sessionsReader.ReadLine()) != null)
                         {
-                            WorkingSession session = new WorkingSession(fullName, date, gap, comment);
-                            workingSessions.Add(session);
+                            parameters = line.Split(',');
+
+                            string fullName = parameters[0];
+                            DateTime date = Convert.ToDateTime(parameters[1]);
+                            byte gap = Convert.ToByte(parameters[2]);
+                            string comment = parameters[3];
+
+                            if (fullName == name && fromDate <= date.Date && date.Date <= toDate)
+                            {
+                                WorkingSession session = new WorkingSession(fullName, date, gap, comment);
+                                workingSessions.Add(session);
+                            }
                         }
                     }
-                    sessionsReader.Close();
                 }
                 else if (fromDate != null && toDate == null)
                 {
-                    StreamReader sessionReader = new StreamReader(workingSessionsFilePath);
-
-                    string line;
-                    string[] parameters;
-
-                    while ((line = sessionReader.ReadLine()) != null)
+                    using (StreamReader sessionReader = new StreamReader(workingSessionsFilePath))
                     {
-                        parameters = line.Split(',');
+                        string line;
+                        string[] parameters;
 
-                        string fullName = parameters[0];
-                        DateTime date = Convert.ToDateTime(parameters[1]);
-                        byte gap = Convert.ToByte(parameters[2]);
-                        string comment = parameters[3];
-
-                        if (fromDate <= date.Date && date.Date <= DateTime.Now.Date)
+                        while ((line = sessionReader.ReadLine()) != null)
                         {
-                            WorkingSession session = new WorkingSession(fullName, date, gap, comment);
-                            workingSessions.Add(session);
+                            parameters = line.Split(',');
+
+                            string fullName = parameters[0];
+                            DateTime date = Convert.ToDateTime(parameters[1]);
+                            byte gap = Convert.ToByte(parameters[2]);
+                            string comment = parameters[3];
+
+                            if (fullName == name && fromDate <= date.Date && date.Date <= DateTime.Now.Date)
+                            {
+                                WorkingSession session = new WorkingSession(fullName, date, gap, comment);
+                                workingSessions.Add(session);
+                            }
                         }
                     }
-                    sessionReader.Close();
                 }
                 else
                 {
-                    StreamReader sessionReader = new StreamReader(workingSessionsFilePath);
-
-                    string line;
-                    string[] parameters;
-
-                    while ((line = sessionReader.ReadLine()) != null)
+                    using (StreamReader sessionReader = new StreamReader(workingSessionsFilePath))
                     {
-                        parameters = line.Split(',');
+                        string line;
+                        string[] parameters;
 
-                        string fullName = parameters[0];
-                        DateTime date = Convert.ToDateTime(parameters[1]);
-                        byte gap = Convert.ToByte(parameters[2]);
-                        string comment = parameters[3];
+                        while ((line = sessionReader.ReadLine()) != null)
+                        {
+                            parameters = line.Split(',');
 
-                        WorkingSession session = new WorkingSession(fullName, date, gap, comment);
-                        workingSessions.Add(session);
+                            string fullName = parameters[0];
+                            if (fullName == name)
+                            {
+                                DateTime date = Convert.ToDateTime(parameters[1]);
+                                byte gap = Convert.ToByte(parameters[2]);
+                                string comment = parameters[3];
+
+                                WorkingSession session = new WorkingSession(fullName, date, gap, comment);
+                                workingSessions.Add(session);
+                            }
+                        }
                     }
-                    sessionReader.Close();
                 }
             }
             catch(Exception ex)
