@@ -9,9 +9,10 @@ namespace PaymentCalculation.Model
     public class Supervisor : Worker
     {
         public decimal Salary { get; set; }
-        public Supervisor(string fullName, string position, decimal salary) : base(fullName, position)
+        public Supervisor(string fullName, decimal salary) : base(fullName)
         {
             Salary = salary;
+            Position = Position.Supervisor;
         }
 
         public void AddEmployee()

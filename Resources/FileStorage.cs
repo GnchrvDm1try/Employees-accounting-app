@@ -36,23 +36,26 @@ namespace PaymentCalculation.Resources
         {
             switch(worker.Position)
             {
-                case "Supervisor":
-                    StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true);
-                    Supervisor supervisor = (Supervisor)worker;
-                    supervisorsWriter.WriteLine(supervisor.FullName + "," + supervisor.Salary);
-                    supervisorsWriter.Close();
+                case Position.Supervisor:
+                    using (StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true))
+                    {
+                        Supervisor supervisor = (Supervisor)worker;
+                        supervisorsWriter.WriteLine(supervisor.FullName + "," + supervisor.Salary);
+                    }
                     break;
-                case "LocalEmployee":
-                    StreamWriter localEmployeesWriter = new StreamWriter(localEmployeeFilePath, true);
-                    LocalEmployee localEmployee = (LocalEmployee)worker;
-                    localEmployeesWriter.WriteLine(localEmployee.FullName + "," + localEmployee.Salary);
-                    localEmployeesWriter.Close();
+                case Position.LocalEmployee:
+                    using (StreamWriter localEmployeesWriter = new StreamWriter(localEmployeeFilePath, true))
+                    {
+                        LocalEmployee localEmployee = (LocalEmployee)worker;
+                        localEmployeesWriter.WriteLine(localEmployee.FullName + "," + localEmployee.Salary);
+                    }
                     break;
-                case "Freelancer":
-                    StreamWriter freelancersWriter = new StreamWriter(freelancerFilePath, true);
-                    Freelancer freelancer = (Freelancer)worker;
-                    freelancersWriter.WriteLine(freelancer.FullName + "," + freelancer.PaymentPerHour);
-                    freelancersWriter.Close();
+                case Position.Freelancer:
+                    using (StreamWriter freelancersWriter = new StreamWriter(freelancerFilePath, true))
+                    {
+                        Freelancer freelancer = (Freelancer)worker;
+                        freelancersWriter.WriteLine(freelancer.FullName + "," + freelancer.PaymentPerHour);
+                    }
                     break;
                 default:
                     throw new Exception("Wrong type of user!");
@@ -63,7 +66,7 @@ namespace PaymentCalculation.Resources
         {
             using (StreamWriter sessionWriter = new StreamWriter(workingSessionsFilePath, true))
             {
-                sessionWriter.WriteLine(session.Name + "," + session.Date.Date + "," + session.Gap + "," + session.Comment);//???????????????????????????????????????
+                sessionWriter.WriteLine(session.Name + "," + session.Date.ToString("dd.MM.yyyy") + "," + session.Gap + "," + session.Comment);
             }
         }
 

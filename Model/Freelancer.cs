@@ -9,9 +9,10 @@ namespace PaymentCalculation.Model
     public class Freelancer : Worker
     {
         public decimal PaymentPerHour { get; set; }
-        public Freelancer(string fullName, string position, decimal paymentPerHour) : base(fullName, position)
+        public Freelancer(string fullName, decimal paymentPerHour) : base(fullName)
         {
             PaymentPerHour = paymentPerHour;
+            Position = Position.Freelancer;
         }
     }
 }

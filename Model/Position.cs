@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PaymentCalculation.PaymentCalculationConsole
+namespace PaymentCalculation.Model
 {
-    class Class1
+    public enum Position
     {
+        Supervisor,
+        LocalEmployee,
+        Freelancer
     }
 }

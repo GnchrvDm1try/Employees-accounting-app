@@ -11,18 +11,13 @@ namespace PaymentCalculation.PaymentCalculationConsole
         {
             //Console.WriteLine("Enter your name: ");
             //string currentUserName = Console.ReadLine();
-            Supervisor w = new Supervisor("Victor Stepov", "Supervisor", 200000);
-            //Supervisor d = new Supervisor("Ivan Ivanov", "Supervisor", 210000);
+
+            //Supervisor w = new Supervisor("Victor Stepov", 2500);
+            //LocalEmployee d = new LocalEmployee("Ivan Ivanov", 1850);
+            //LocalEmployee dd = new LocalEmployee("Vasiliy Sverdlov", 2000);
+            //Freelancer f = new Freelancer("Bohdan Nemov", 10);
+
             FileStorage storage = new FileStorage();
-            List<WorkingSession> sessions = storage.GetWorkingSessions(w.FullName, new DateTime(2021, 11, 24));
-            foreach(var item in sessions)
-            {
-                Console.WriteLine(item.ToString());
-            }
-            //WorkingSession session = new WorkingSession(w.FullName, new DateTime(2021, 11, 28), 11, "Some stuff2");
-            //storage.AddWorkingSession(session);
-            //storage.AddWorker(d);
-            //storage.GetWorkingSessions
         }
     }
 }
