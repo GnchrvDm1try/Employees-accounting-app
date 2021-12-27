@@ -9,8 +9,8 @@ namespace PaymentCalculation.Resources
     public class FileStorage : IStorage
     {
         static readonly string supervisorsFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName + "\\Resources\\Storage\\Supervisors.csv";
-        static readonly string localEmployeeFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName + "\\Resources\\Storage\\LocalEmployees.csv";
-        static readonly string freelancerFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName + "\\Resources\\Storage\\Freelancers.csv";
+        static readonly string localEmployeesFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName + "\\Resources\\Storage\\LocalEmployees.csv";
+        static readonly string freelancersFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName + "\\Resources\\Storage\\Freelancers.csv";
         static readonly string workingSessionsFilePath = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.Parent.FullName + "\\Resources\\Storage\\WorkingSessions.csv";
         static FileStorage()
         {
@@ -18,13 +18,13 @@ namespace PaymentCalculation.Resources
             {
                 File.Create(supervisorsFilePath);
             }
-            if(!File.Exists(localEmployeeFilePath))
+            if(!File.Exists(localEmployeesFilePath))
             {
-                File.Create(localEmployeeFilePath);
+                File.Create(localEmployeesFilePath);
             }
-            if(!File.Exists(freelancerFilePath))
+            if(!File.Exists(freelancersFilePath))
             {
-                File.Create(freelancerFilePath);
+                File.Create(freelancersFilePath);
             }
             if(!File.Exists(workingSessionsFilePath))
             {
@@ -34,31 +34,38 @@ namespace PaymentCalculation.Resources
 
         public void AddWorker(Worker worker)
         {
-            switch(worker.Position)
+            try
             {
-                case Position.Supervisor:
-                    using (StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true))
-                    {
-                        Supervisor supervisor = (Supervisor)worker;
-                        supervisorsWriter.WriteLine(supervisor.FullName + "," + supervisor.Salary);
-                    }
-                    break;
-                case Position.LocalEmployee:
-                    using (StreamWriter localEmployeesWriter = new StreamWriter(localEmployeeFilePath, true))
-                    {
-                        LocalEmployee localEmployee = (LocalEmployee)worker;
-                        localEmployeesWriter.WriteLine(localEmployee.FullName + "," + localEmployee.Salary);
-                    }
-                    break;
-                case Position.Freelancer:
-                    using (StreamWriter freelancersWriter = new StreamWriter(freelancerFilePath, true))
-                    {
-                        Freelancer freelancer = (Freelancer)worker;
-                        freelancersWriter.WriteLine(freelancer.FullName + "," + freelancer.PaymentPerHour);
-                    }
-                    break;
-                default:
-                    throw new Exception("Wrong type of user!");
+                switch (worker.Position)
+                {
+                    case Position.Supervisor:
+                        using (StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true))
+                        {
+                            Supervisor supervisor = (Supervisor)worker;
+                            supervisorsWriter.WriteLine(supervisor.Login + "," + supervisor.FirstName + "," + supervisor.LastName + "," + supervisor.Salary);
+                        }
+                        break;
+                    case Position.LocalEmployee:
+                        using (StreamWriter localEmployeesWriter = new StreamWriter(localEmployeesFilePath, true))
+                        {
+                            LocalEmployee localEmployee = (LocalEmployee)worker;
+                            localEmployeesWriter.WriteLine(localEmployee.Login + "," + localEmployee.FirstName + "," + localEmployee.LastName + "," + localEmployee.Salary);
+                        }
+                        break;
+                    case Position.Freelancer:
+                        using (StreamWriter freelancersWriter = new StreamWriter(freelancersFilePath, true))
+                        {
+                            Freelancer freelancer = (Freelancer)worker;
+                            freelancersWriter.WriteLine(freelancer.Login + "," + freelancer.FirstName + "," + freelancer.LastName + "," + freelancer.PaymentPerHour);
+                        }
+                        break;
+                    default:
+                        throw new Exception("Wrong type of user!");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Не удалось добавить работника! " + ex.Message);
             }
         }
 
@@ -66,93 +73,144 @@ namespace PaymentCalculation.Resources
         {
             using (StreamWriter sessionWriter = new StreamWriter(workingSessionsFilePath, true))
             {
-                sessionWriter.WriteLine(session.Name + "," + session.Date.ToString("dd.MM.yyyy") + "," + session.Gap + "," + session.Comment);
+                sessionWriter.WriteLine(session.Login + "," + session.Date.ToString("dd.MM.yyyy") + "," + session.Gap + "," + session.Comment);
             }
         }
 
-        public List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate = null, DateTime? toDate = null)
+        public List<WorkingSession> GetWorkingSessions(string login, DateTime? fromDate = null, DateTime? toDate = null)
         {
             List<WorkingSession> workingSessions = new List<WorkingSession>();
             try
             {
-                if (fromDate != null && toDate != null)
+                using (StreamReader sessionsReader = new StreamReader(workingSessionsFilePath))
                 {
-                    using (StreamReader sessionsReader = new StreamReader(workingSessionsFilePath))
+                    string line;
+                    string[] parameters;
+
+                    while ((line = sessionsReader.ReadLine()) != null)
                     {
-                        string line;
-                        string[] parameters;
+                        parameters = line.Split(',');
 
-                        while ((line = sessionsReader.ReadLine()) != null)
+                        DateTime date = Convert.ToDateTime(parameters[1]);
+                        byte gap = Convert.ToByte(parameters[2]);
+                        string comment = parameters[3];
+
+                        if (fromDate != null && toDate != null)
                         {
-                            parameters = line.Split(',');
-
-                            string fullName = parameters[0];
-                            DateTime date = Convert.ToDateTime(parameters[1]);
-                            byte gap = Convert.ToByte(parameters[2]);
-                            string comment = parameters[3];
-
-                            if (fullName == name && fromDate <= date.Date && date.Date <= toDate)
+                            if (parameters[0] == login && fromDate <= date.Date && date.Date <= toDate)
                             {
-                                WorkingSession session = new WorkingSession(fullName, date, gap, comment);
+                                WorkingSession session = new WorkingSession(login, date, gap, comment);
                                 workingSessions.Add(session);
                             }
                         }
-                    }
-                }
-                else if (fromDate != null && toDate == null)
-                {
-                    using (StreamReader sessionReader = new StreamReader(workingSessionsFilePath))
-                    {
-                        string line;
-                        string[] parameters;
-
-                        while ((line = sessionReader.ReadLine()) != null)
+                        else if (fromDate != null && toDate == null)
                         {
-                            parameters = line.Split(',');
-
-                            string fullName = parameters[0];
-                            DateTime date = Convert.ToDateTime(parameters[1]);
-                            byte gap = Convert.ToByte(parameters[2]);
-                            string comment = parameters[3];
-
-                            if (fullName == name && fromDate <= date.Date && date.Date <= DateTime.Now.Date)
+                            if (parameters[0] == login && fromDate <= date.Date && date.Date <= DateTime.Now.Date)
                             {
-                                WorkingSession session = new WorkingSession(fullName, date, gap, comment);
+                                WorkingSession session = new WorkingSession(login, date, gap, comment);
                                 workingSessions.Add(session);
                             }
                         }
-                    }
-                }
-                else
-                {
-                    using (StreamReader sessionReader = new StreamReader(workingSessionsFilePath))
-                    {
-                        string line;
-                        string[] parameters;
-
-                        while ((line = sessionReader.ReadLine()) != null)
+                        else
                         {
-                            parameters = line.Split(',');
-
-                            string fullName = parameters[0];
-                            if (fullName == name)
-                            {
-                                DateTime date = Convert.ToDateTime(parameters[1]);
-                                byte gap = Convert.ToByte(parameters[2]);
-                                string comment = parameters[3];
-
-                                WorkingSession session = new WorkingSession(fullName, date, gap, comment);
-                                workingSessions.Add(session);
-                            }
+                            WorkingSession session = new WorkingSession(login, date, gap, comment);
+                            workingSessions.Add(session);
                         }
                     }
                 }
+
             }
             catch(Exception ex)
             {
                 Console.WriteLine("Не удалось считать файл! " + ex.Message);
             }
             return workingSessions;
+        }
+
+        public Worker FindWorkerByLogin(string login)
+        {
+            Worker worker = null;
+            try
+            {
+                using (StreamReader streamReader = new StreamReader(supervisorsFilePath))
+                {
+                    string line;
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        string[] parameters = line.Split(',');
+                        if (parameters[0] == login)
+                        {
+                            string workerFirstName = parameters[1];
+                            string workerLastName = parameters[2];
+                            decimal salary = Convert.ToDecimal(parameters[3]);
+                            worker = new Supervisor(login, workerFirstName, workerLastName, salary);
+                            break;
+                        }
+                    }
+                }
+                if (worker != null)
+                {
+                    using (StreamReader streamReader = new StreamReader(localEmployeesFilePath))
+                    {
+                        string line;
+                        while ((line = streamReader.ReadLine()) != null)
+                        {
+                            string[] parameters = line.Split(',');
+                            if (parameters[0] == login)
+                            {
+                                string workerFirstName = parameters[1];
+                                string workerLastName = parameters[2];
+                                decimal salary = Convert.ToDecimal(parameters[3]);
+                                worker = new LocalEmployee(login, workerFirstName, workerLastName, salary);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(worker != null)
+                {
+                    using (StreamReader streamReader = new StreamReader(freelancersFilePath))
+                    {
+                        string line;
+                        while((line = streamReader.ReadLine()) != null)
+                        {
+                            string[] parameters = line.Split(',');
+                            if(parameters[0] == login)
+                            {
+                                string workerFirstName = parameters[1];
+                                string workerLastName = parameters[2];
+                                decimal paymentPerHour = Convert.ToDecimal(parameters[3]);
+                                worker = new Freelancer(login, workerFirstName, workerLastName, paymentPerHour);
+                                break;
+                            }
+                        }
+                    }
+                }
+                throw new Exception("There is no worker with this login.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Работник не найден! " + ex.Message);
+            }
+            return worker;
+        }
+
+        public decimal CalculatePayment(string login)
+        {
+            const byte WORKING_HOURS_ALLOWED = 160;
+            try
+            {
+                Worker worker = FindWorkerByLogin(login);
+                switch(worker.Position)
+                {
+
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Не удалось посчитать выплату. " + ex.Message);
+            }
+            return 42m;
         }
     }
 }

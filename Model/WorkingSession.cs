@@ -8,14 +8,14 @@ namespace PaymentCalculation.Model
 {
     public class WorkingSession
     {
-        public string Name { get; }
+        public string Login { get; }
         public DateTime Date { get; }
-        public byte Gap { get; }
+        public byte Gap { get; set; }
         public string Comment { get; set; }
 
-        public WorkingSession(string name, DateTime date, byte gap, string comment)
+        public WorkingSession(string login, DateTime date, byte gap, string comment)
         {
-            Name = name;
+            Login = login;
             Date = date;
             Gap = gap;
             Comment = comment;
@@ -23,7 +23,7 @@ namespace PaymentCalculation.Model
 
         public override string ToString()
         {
-            return $"Name: {Name}\tDate: {Date.ToString("dd.MM.yyyy")}\tGap: {Gap}\tComment: {Comment}";
+            return $"Login: {Login}\tDate: {Date.ToString("dd.MM.yyyy")}\tGap: {Gap}\tComment: {Comment}";
         }
     }
 }
