@@ -16,16 +16,6 @@ namespace PaymentCalculation.Model
             Position = Position.Supervisor;
         }
 
-        public void AddEmployee()
-        {
-            
-        }
-
-        public void AddEmployeeTime()
-        {
-
-        }
-
         public decimal CalculatePayment(List<WorkingSession> sessions)
         {
             decimal totalPayment = 0;

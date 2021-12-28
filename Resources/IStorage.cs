@@ -10,8 +10,8 @@ namespace PaymentCalculation.Resources
 {
     interface IStorage
     {
-        void AddWorkingSession(WorkingSession session);
         void AddWorker(Worker worker);
+        void AddWorkingSession(WorkingSession session);
         Worker FindWorkerByLogin(string login);
         List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate, DateTime? toDate);
     }

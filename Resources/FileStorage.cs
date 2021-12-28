@@ -194,23 +194,5 @@ namespace PaymentCalculation.Resources
             }
             return worker;
         }
-
-        public decimal CalculatePayment(string login)
-        {
-            const byte WORKING_HOURS_ALLOWED = 160;
-            try
-            {
-                Worker worker = FindWorkerByLogin(login);
-                switch(worker.Position)
-                {
-
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine("Не удалось посчитать выплату. " + ex.Message);
-            }
-            return 42m;
-        }
     }
 }
