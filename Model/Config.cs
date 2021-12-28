@@ -13,5 +13,6 @@ namespace PaymentCalculation.Model
         public const decimal SUPERVISOR_MONTH_SALARY = 2700;
         public const decimal SUPERVISOR_MONTH_BONUS = 270;
         public const decimal LOCAL_EMPLOYEE_MONTH_SALARY = 1500;
+        public const decimal FREELANCER_HOUR_PAYMENT = 13;
     }
 }
