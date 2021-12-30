@@ -16,7 +16,7 @@ namespace PaymentCalculation.Model
             Position = Position.Freelancer;
         }
 
-        public decimal CalculatePayment(List<WorkingSession> sessions)
+        public override decimal CalculatePayment(List<WorkingSession> sessions)
         {
             decimal totalPayment = 0;
             try

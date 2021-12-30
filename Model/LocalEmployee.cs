@@ -16,9 +16,10 @@ namespace PaymentCalculation.Model
             Position = Position.LocalEmployee;
         }
 
-        public decimal CalculatePayment(List<WorkingSession> sessions)
+        public override decimal CalculatePayment(List<WorkingSession> sessions)
         {
             decimal totalPayment = 0;
+            decimal totalHours = 0;
             decimal paymentPerHour = Config.LOCAL_EMPLOYEE_MONTH_SALARY / Config.MONTH_WORKING_HOURS_ALLOWED;
             try 
             {
@@ -26,11 +27,16 @@ namespace PaymentCalculation.Model
                 {
                     if(session.Login == Login)
                     {
-                        if (session.Gap <= Config.DAY_WORKING_HOURS_ALLOWED)
-                            totalPayment += paymentPerHour * session.Gap;
-                        else
-                            totalPayment += paymentPerHour * Config.DAY_WORKING_HOURS_ALLOWED + (session.Gap - Config.DAY_WORKING_HOURS_ALLOWED) * paymentPerHour * 2;
+                        totalHours += session.Gap;
                     }
+                }
+                if(totalHours <= Config.MONTH_WORKING_HOURS_ALLOWED)
+                {
+                    totalPayment = totalHours * paymentPerHour;
+                }
+                else
+                {
+                    totalPayment = Config.MONTH_WORKING_HOURS_ALLOWED * paymentPerHour + (totalHours - Config.MONTH_WORKING_HOURS_ALLOWED) * paymentPerHour * 2;
                 }
             }
             catch(Exception ex)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PaymentCalculation.Model
 {
@@ -15,6 +16,11 @@ namespace PaymentCalculation.Model
             Login = login;
             FirstName = firstName;
             LastName = lastName;
+        }
+
+        public virtual decimal CalculatePayment(List<WorkingSession> sessions)
+        {
+            return 0;
         }
     }
 }

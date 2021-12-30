@@ -16,7 +16,7 @@ namespace PaymentCalculation.Model
             Position = Position.Supervisor;
         }
 
-        public decimal CalculatePayment(List<WorkingSession> sessions)
+        public override decimal CalculatePayment(List<WorkingSession> sessions)
         {
             decimal totalPayment = 0;
             decimal paymentPerHour = Config.SUPERVISOR_MONTH_SALARY / Config.MONTH_WORKING_HOURS_ALLOWED;
