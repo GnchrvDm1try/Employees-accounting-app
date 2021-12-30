@@ -36,6 +36,8 @@ namespace PaymentCalculation.Resources
         {
             try
             {
+                if (FindWorkerByLogin(worker.Login) != null)
+                    throw new Exception("User with this login already exists");
                 switch (worker.Position)
                 {
                     case Position.Supervisor:
@@ -140,15 +142,12 @@ namespace PaymentCalculation.Resources
                         string[] parameters = line.Split(',');
                         if (parameters[0] == login)
                         {
-                            string workerFirstName = parameters[1];
-                            string workerLastName = parameters[2];
-                            decimal salary = Convert.ToDecimal(parameters[3]);
-                            worker = new Supervisor(login, workerFirstName, workerLastName, salary);
-                            break;
+                            worker = new Supervisor(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
+                            return worker;
                         }
                     }
                 }
-                if (worker != null)
+                if (worker == null)
                 {
                     using (StreamReader streamReader = new StreamReader(localEmployeesFilePath))
                     {
@@ -158,16 +157,13 @@ namespace PaymentCalculation.Resources
                             string[] parameters = line.Split(',');
                             if (parameters[0] == login)
                             {
-                                string workerFirstName = parameters[1];
-                                string workerLastName = parameters[2];
-                                decimal salary = Convert.ToDecimal(parameters[3]);
-                                worker = new LocalEmployee(login, workerFirstName, workerLastName, salary);
-                                break;
+                                worker = new LocalEmployee(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
+                                return worker;
                             }
                         }
                     }
                 }
-                if(worker != null)
+                if(worker == null)
                 {
                     using (StreamReader streamReader = new StreamReader(freelancersFilePath))
                     {
@@ -177,11 +173,8 @@ namespace PaymentCalculation.Resources
                             string[] parameters = line.Split(',');
                             if(parameters[0] == login)
                             {
-                                string workerFirstName = parameters[1];
-                                string workerLastName = parameters[2];
-                                decimal paymentPerHour = Convert.ToDecimal(parameters[3]);
-                                worker = new Freelancer(login, workerFirstName, workerLastName, paymentPerHour);
-                                break;
+                                worker = new Freelancer(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
+                                return worker;
                             }
                         }
                     }
