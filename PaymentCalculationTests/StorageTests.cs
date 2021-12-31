@@ -31,6 +31,31 @@ namespace PaymentCalculation.PaymentCalculationTests
             Assert.IsTrue(worker.Login == login);
         }
 
+        //Test that checks if the list of preset sessions matches with the list of returned by the method sessions
+        [Test]
+        public void GetWorkingSessionsTest()
+        {
+            FileStorage fileStorage = new FileStorage();
+            bool isEqual = true;
+            Worker testUser = fileStorage.FindWorkerByLogin("bohdan1");
+            //The list of sessions, which are in the file
+            List<WorkingSession> testWorkingSessions = new List<WorkingSession>()
+            {
+                new WorkingSession(testUser.Login, new DateTime(2021, 11, 29), 5, "Some staff #1"),
+                new WorkingSession(testUser.Login, new DateTime(2021, 11, 30), 2, "Some staff #2"),
+                new WorkingSession(testUser.Login, new DateTime(2021, 12, 2), 7, "Some staff #3"),
+                new WorkingSession(testUser.Login, new DateTime(2021, 12, 4), 1, "Some staff #4")
+            };
+            //The list of sessions, which belong to the testing user, returned by the method
+            List<WorkingSession> workingSessions = fileStorage.GetWorkingSessions(testUser.Login);
+            for(int i = 0; i < testWorkingSessions.Count; i++)
+            {
+                if (testWorkingSessions[i].ToString() != workingSessions[i].ToString())
+                    isEqual = false;
+            }
+            Assert.IsTrue(isEqual);
+        }
+
         [Test]
         public void GetReportsTest()
         {
