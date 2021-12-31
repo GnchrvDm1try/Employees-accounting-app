@@ -115,8 +115,11 @@ namespace PaymentCalculation.Resources
                         }
                         else
                         {
-                            WorkingSession session = new WorkingSession(login, date, gap, comment);
-                            workingSessions.Add(session);
+                            if(parameters[0] == login)
+                            {
+                                WorkingSession session = new WorkingSession(login, date, gap, comment);
+                                workingSessions.Add(session);
+                            }
                         }
                     }
                 }
