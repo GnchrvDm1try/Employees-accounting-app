@@ -14,6 +14,23 @@ namespace PaymentCalculation.PaymentCalculationTests
         {
         }
 
+        //Test that checks if the searching method finds the worker whose login matches with the searching login
+        //If the worker not found test passes
+        //Otherwise (if login does not match), test failed
+        [Test]
+        public void FindWorkerByLoginTest()
+        {
+            FileStorage fileStorage = new FileStorage();
+            string login = "victor1";//Pick login here. It should be in any file
+            Worker worker = fileStorage.FindWorkerByLogin(login);
+            if (worker == null)
+            {
+                Assert.IsTrue(true);
+                return;
+            }
+            Assert.IsTrue(worker.Login == login);
+        }
+
         [Test]
         public void GetReportsTest()
         {
