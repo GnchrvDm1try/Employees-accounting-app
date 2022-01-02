@@ -10,9 +10,12 @@ namespace PaymentCalculation.Model
     {
         public decimal PaymentPerHour { get; set; }
        
-        public Freelancer(string login, string firstName, string lastName, decimal paymentPerHour) : base(login, firstName, lastName)
+        public Freelancer(string login, string firstName, string lastName, decimal? paymentPerHour = null) : base(login, firstName, lastName)
         {
-            PaymentPerHour = paymentPerHour;
+            if (paymentPerHour != null)
+                PaymentPerHour = (decimal)paymentPerHour;
+            else
+                PaymentPerHour = Config.FREELANCER_HOUR_PAYMENT;
             Position = Position.Freelancer;
         }
 
@@ -25,7 +28,7 @@ namespace PaymentCalculation.Model
                 {
                     if(session.Login == Login)
                     {
-                        totalPayment += Config.FREELANCER_HOUR_PAYMENT * session.Gap;
+                        totalPayment += PaymentPerHour * session.Gap;
                     }
                 }
             }

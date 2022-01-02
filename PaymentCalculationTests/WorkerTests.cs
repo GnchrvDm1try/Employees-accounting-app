@@ -20,7 +20,7 @@ namespace PaymentCalculation.PaymentCalculationTests
         [Test]
         public void PaymentCalculateTest()
         {
-            Worker worker = new Supervisor("test", "testname", "testlastname", 2500); //Pick worker's position here
+            Worker worker = new Supervisor("test", "testname", "testlastname"); //Pick worker's position here
             List<WorkingSession> workingSessions = new List<WorkingSession>
             {
                 //Session payment is 101,25 (Supervisor)

@@ -10,9 +10,12 @@ namespace PaymentCalculation.Model
     {
         public decimal Salary { get; set; }
         
-        public LocalEmployee(string login, string firstName, string lastName, decimal salary) : base(login, firstName, lastName)
+        public LocalEmployee(string login, string firstName, string lastName, decimal? salary = null) : base(login, firstName, lastName)
         {
-            Salary = salary;
+            if (salary != null)
+                Salary = (decimal)salary;
+            else
+                Salary = Config.LOCAL_EMPLOYEE_MONTH_SALARY;
             Position = Position.LocalEmployee;
         }
 
@@ -20,7 +23,7 @@ namespace PaymentCalculation.Model
         {
             decimal totalPayment = 0;
             decimal totalHours = 0;
-            decimal paymentPerHour = Config.LOCAL_EMPLOYEE_MONTH_SALARY / Config.MONTH_WORKING_HOURS_ALLOWED;
+            decimal paymentPerHour = Salary / Config.MONTH_WORKING_HOURS_ALLOWED;
             try 
             {
                 foreach(WorkingSession session in sessions)
