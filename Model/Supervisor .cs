@@ -10,19 +10,16 @@ namespace PaymentCalculation.Model
     {
         public decimal Salary { get; set; }
         
-        public Supervisor(string login, string firstName, string lastName, decimal? salary = null) : base(login, firstName, lastName)
+        public Supervisor(string login, string firstName, string lastName, decimal salary) : base(login, firstName, lastName)
         {
-            if (salary != null)
-                Salary = (decimal)salary;
-            else
-                Salary = Config.SUPERVISOR_MONTH_SALARY;
+            Salary = salary;
             Position = Position.Supervisor;
         }
 
         public override decimal CalculatePayment(List<WorkingSession> sessions)
         {
             decimal totalPayment = 0;
-            decimal paymentPerHour = Salary / Config.MONTH_WORKING_HOURS_ALLOWED;
+            decimal paymentPerHour = Config.SUPERVISOR_MONTH_SALARY / Config.MONTH_WORKING_HOURS_ALLOWED;
             decimal overworkingBonus = Config.SUPERVISOR_MONTH_BONUS / Config.MONTH_WORKING_HOURS_ALLOWED * Config.DAY_WORKING_HOURS_ALLOWED;
             try
             {
