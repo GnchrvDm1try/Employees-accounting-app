@@ -35,12 +35,14 @@ namespace PaymentCalculation.PaymentCalculationConsole
                         Environment.Exit(0);
                     else if (option == "1")
                         AddWorker();
-                    else if(option == "2")
+                    else if (option == "2")
                     {
                         Console.Write("Enter worker's login: ");
                         string login = Console.ReadLine();
                         AddWorkingSession(login);
                     }
+                    else if (option == "4")
+                        PrintWorkerReport();
                     else
                     {
                         Console.WriteLine("Enter correct number!");
@@ -138,14 +140,62 @@ namespace PaymentCalculation.PaymentCalculationConsole
                     storage.AddWorkingSession(session);
                     Console.WriteLine("Added new session.");
                 }
-                else
-                {
-                    throw new Exception("There is no worker with this login.");
-                }
             }
             catch(Exception ex)
             {
                 Console.WriteLine($"Failed to add working session: {ex.Message}");
+            }
+            finally
+            {
+                AvailableActions();
+            }
+        }
+
+        static void PrintWorkerReport()
+        {
+            try
+            {
+                LoginInput:
+                Console.Write("Enter worker's login: ");
+                string login = Console.ReadLine();
+                Worker worker = storage.FindWorkerByLogin(login);
+                if (worker == null)
+                    goto LoginInput;
+
+                Console.Write("Enter start date of the report(not required): ");
+                DateTime? fromDate = null;
+                DateTime? toDate = null;
+                string stringFromDate = Console.ReadLine();
+                if (!string.IsNullOrEmpty(stringFromDate))
+                    fromDate = Convert.ToDateTime(stringFromDate);
+
+                if(fromDate != null)
+                {
+                    Console.Write("Enter end date of the report(not required): ");
+                    string stringToDate = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(stringToDate))
+                        toDate = Convert.ToDateTime(stringToDate);
+                }
+
+                //String interpolation, which displays information about the employee and, depending on the dates values
+                Console.WriteLine($"Employee report: {worker.FirstName} {worker.LastName} - {worker.Position}" +
+                    //uses ternary operator, that checks if the date is null and based on this builds the string value 
+                    $"{(fromDate == null ? "" : toDate == null ? $" for the period from {fromDate} to {DateTime.Now.Date.AddDays(1)}" : $" for the period from {fromDate} to {toDate}")}:");
+
+                List<WorkingSession> workingSessions = storage.GetWorkingSessions(login, fromDate, toDate);
+
+                decimal totalPayment = worker.CalculatePayment(workingSessions);
+                ushort totalHours = 0;
+                foreach (WorkingSession session in workingSessions)
+                {
+                totalHours += session.Gap;
+                    Console.WriteLine(session.ToString());
+                }
+                Console.WriteLine($"Result: {totalHours} hours, {totalPayment} to pay.");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Failed to get report: {ex.Message}");
             }
             finally
             {

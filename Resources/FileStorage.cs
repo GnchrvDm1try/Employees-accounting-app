@@ -186,7 +186,7 @@ namespace PaymentCalculation.Resources
             }
             catch (Exception ex)
             {
-                
+                Console.WriteLine($"Failed to find user: {ex.Message}");
             }
             return worker;
         }
