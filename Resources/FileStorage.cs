@@ -67,7 +67,7 @@ namespace PaymentCalculation.Resources
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Не удалось добавить работника! " + ex.Message);
+                
             }
         }
 
@@ -127,7 +127,7 @@ namespace PaymentCalculation.Resources
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Не удалось считать файл! " + ex.Message);
+                
             }
             return workingSessions;
         }
@@ -186,7 +186,7 @@ namespace PaymentCalculation.Resources
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Работник не найден! " + ex.Message);
+                
             }
             return worker;
         }
