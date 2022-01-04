@@ -11,8 +11,13 @@ namespace PaymentCalculation.Resources
     interface IStorage
     {
         void AddWorker(Worker worker);
+
         void AddWorkingSession(WorkingSession session);
+
         Worker FindWorkerByLogin(string login);
-        List<WorkingSession> GetWorkingSessions(string name, DateTime? fromDate, DateTime? toDate);
+
+        List<WorkingSession> GetWorkingSessionsByLogin(string name, DateTime? fromDate, DateTime? toDate);
+
+        List<WorkingSession> GetAllWorkingSessions(DateTime? fromDate, DateTime? toDate);
     }
 }

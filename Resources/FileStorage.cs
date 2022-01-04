@@ -79,7 +79,7 @@ namespace PaymentCalculation.Resources
             }
         }
 
-        public List<WorkingSession> GetWorkingSessions(string login, DateTime? fromDate = null, DateTime? toDate = null)
+        public List<WorkingSession> GetWorkingSessionsByLogin(string login, DateTime? fromDate = null, DateTime? toDate = null)
         {
             List<WorkingSession> workingSessions = new List<WorkingSession>();
             try
@@ -128,6 +128,49 @@ namespace PaymentCalculation.Resources
             catch(Exception ex)
             {
                 
+            }
+            return workingSessions;
+        }
+
+        public List<WorkingSession> GetAllWorkingSessions(DateTime? fromDate = null, DateTime? toDate = null)
+        {
+            List<WorkingSession> workingSessions = new List<WorkingSession>();
+            using (StreamReader sessionsReader = new StreamReader(workingSessionsFilePath))
+            {
+                string line;
+                string[] parameters;
+
+                while ((line = sessionsReader.ReadLine()) != null)
+                {
+                    parameters = line.Split(',');
+
+                    string login = parameters[0];
+                    DateTime date = Convert.ToDateTime(parameters[1]);
+                    byte gap = Convert.ToByte(parameters[2]);
+                    string comment = parameters[3];
+
+                    if (fromDate != null && toDate != null)
+                    {
+                        if (fromDate <= date.Date && date.Date <= toDate)
+                        {
+                            WorkingSession session = new WorkingSession(login, date, gap, comment);
+                            workingSessions.Add(session);
+                        }
+                    }
+                    else if (fromDate != null && toDate == null)
+                    {
+                        if (fromDate <= date.Date && date.Date <= DateTime.Now.Date)
+                        {
+                            WorkingSession session = new WorkingSession(login, date, gap, comment);
+                            workingSessions.Add(session);
+                        }
+                    }
+                    else
+                    {
+                        WorkingSession session = new WorkingSession(login, date, gap, comment);
+                        workingSessions.Add(session);
+                    }
+                }
             }
             return workingSessions;
         }
