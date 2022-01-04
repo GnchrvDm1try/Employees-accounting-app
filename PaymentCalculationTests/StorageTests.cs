@@ -47,7 +47,7 @@ namespace PaymentCalculation.PaymentCalculationTests
                 new WorkingSession(testUser.Login, new DateTime(2021, 12, 4), 1, "Some staff #4")
             };
             //The list of sessions, which belong to the testing user, returned by the method
-            List<WorkingSession> workingSessions = fileStorage.GetWorkingSessions(testUser.Login);
+            List<WorkingSession> workingSessions = fileStorage.GetWorkingSessionsByLogin(testUser.Login);
             for(int i = 0; i < testWorkingSessions.Count; i++)
             {
                 if (testWorkingSessions[i].ToString() != workingSessions[i].ToString())

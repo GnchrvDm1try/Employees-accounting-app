@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using PaymentCalculation.Model;
 using PaymentCalculation.Resources;
@@ -41,6 +42,8 @@ namespace PaymentCalculation.PaymentCalculationConsole
                         string login = Console.ReadLine();
                         AddWorkingSession(login);
                     }
+                    else if (option == "3")
+                        PrintAllWorkersReport();
                     else if (option == "4")
                         PrintWorkerReport();
                     else
@@ -182,18 +185,79 @@ namespace PaymentCalculation.PaymentCalculationConsole
                     //uses ternary operator, that checks if the date is null and based on this builds the string value 
                     $"{(fromDate == null ? "" : toDate == null ? $" for the period from {fromDate} to {DateTime.Now.Date.AddDays(1)}" : $" for the period from {fromDate} to {toDate}")}:");
 
-                List<WorkingSession> workingSessions = storage.GetWorkingSessions(login, fromDate, toDate);
+                List<WorkingSession> workingSessions = storage.GetWorkingSessionsByLogin(login, fromDate, toDate);
 
                 decimal totalPayment = worker.CalculatePayment(workingSessions);
                 ushort totalHours = 0;
                 foreach (WorkingSession session in workingSessions)
                 {
-                totalHours += session.Gap;
+                    totalHours += session.Gap;
                     Console.WriteLine(session.ToString());
                 }
                 Console.WriteLine($"Result: {totalHours} hours, {totalPayment} to pay.");
             }
             catch(Exception ex)
+            {
+                Console.WriteLine($"Failed to get report: {ex.Message}");
+            }
+            finally
+            {
+                AvailableActions();
+            }
+        }
+
+        static void PrintAllWorkersReport()
+        {
+            try
+            {
+                Console.Write("Enter start date of the report(not required): ");
+                DateTime? fromDate = null;
+                DateTime? toDate = null;
+                string stringFromDate = Console.ReadLine();
+                if (!string.IsNullOrEmpty(stringFromDate))
+                    fromDate = Convert.ToDateTime(stringFromDate);
+
+                if(fromDate != null)
+                {
+                    Console.Write("Enter end date of the report(not required): ");
+                    string stringToDate = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(stringToDate))
+                        toDate = Convert.ToDateTime(stringToDate);
+                }
+
+                //String interpolation, which displays information about the employee and, depending on the dates values
+                Console.WriteLine($"Employees report " +
+                    //uses ternary operator, that checks if the date is null and based on this builds the string value 
+                    $"{(fromDate == null ? "" : toDate == null ? $" for the period from {fromDate} to {DateTime.Now.Date.AddDays(1)}" : $" for the period from {fromDate} to {toDate}")}:");
+
+                List<WorkingSession> allWorkingSessions = storage.GetAllWorkingSessions(fromDate, toDate);
+                List<WorkingSession> workerSessions = new List<WorkingSession>();
+                string login;
+                decimal totalPayment;
+                ushort totalHours;
+                for(int i = 0; i < allWorkingSessions.Count; i++)
+                {
+                    login = allWorkingSessions[i].Login;
+                    if(workerSessions.FirstOrDefault(x => x.Login == login) != null)
+                    {
+                        continue;
+                    }
+                    totalPayment = 0;
+                    totalHours = 0;
+                    for(int j = i; j < allWorkingSessions.Count; j++)
+                    {
+                        if(allWorkingSessions[j].Login == login)
+                        {
+                            workerSessions.Add(allWorkingSessions[j]);
+                            totalHours += allWorkingSessions[j].Gap;
+                        }
+                    }
+                    Worker worker = storage.FindWorkerByLogin(login);
+                    totalPayment = worker.CalculatePayment(workerSessions);
+                    Console.WriteLine($"{worker.FirstName} {worker.LastName} - {worker.Position}, worked {totalHours} hours, {totalPayment} to pay.");
+                }
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine($"Failed to get report: {ex.Message}");
             }
