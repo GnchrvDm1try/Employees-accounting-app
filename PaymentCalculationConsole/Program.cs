@@ -23,6 +23,7 @@ namespace PaymentCalculation.PaymentCalculationConsole
 
         static void AvailableActions()
         {
+            string option;
             Console.WriteLine("(0) Exit");
             switch(currentWorker.Position)
             {
@@ -31,7 +32,7 @@ namespace PaymentCalculation.PaymentCalculationConsole
                     Console.WriteLine("(2) Add working session");
                     Console.WriteLine("(3) View report for all employees");
                     Console.WriteLine("(4) View report for a specific employee");
-                    string option = Console.ReadLine();
+                    option = Console.ReadLine();
                     if (option == "0")
                         Environment.Exit(0);
                     else if (option == "1")
@@ -45,7 +46,11 @@ namespace PaymentCalculation.PaymentCalculationConsole
                     else if (option == "3")
                         PrintAllWorkersReport();
                     else if (option == "4")
-                        PrintWorkerReport();
+                    {
+                        Console.Write("Enter worker's login: ");
+                        string login = Console.ReadLine();
+                        PrintWorkerReport(login);
+                    }
                     else
                     {
                         Console.WriteLine("Enter correct number!");
@@ -55,12 +60,37 @@ namespace PaymentCalculation.PaymentCalculationConsole
                 case Position.LocalEmployee:
                     Console.WriteLine("(1) Add working session");
                     Console.WriteLine("(2) View my sessions");
-                    Console.ReadKey();
+                    option = Console.ReadLine();
+                    if (option == "0")
+                        Environment.Exit(0);
+                    else if (option == "1")
+                    {
+                        AddWorkingSession(currentWorker.Login);
+                    }
+                    else if(option == "2")
+                    {
+                        PrintWorkerReport(currentWorker.Login);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Enter correct number!");
+                        goto case Position.LocalEmployee;
+                    }
                     break;
                 case Position.Freelancer:
                     Console.WriteLine("(1) Add working session");
                     Console.WriteLine("(2) View my sessions");
-                    Console.ReadKey();
+                    option = Console.ReadLine();
+                    if (option == "0")
+                        Environment.Exit(0);
+                    else if(option == "1")
+                    {
+                        AddWorkingSession(currentWorker.Login);
+                    }
+                    else if(option == "2")
+                    {
+                        PrintWorkerReport(currentWorker.Login);
+                    }
                     break;
             }
         }
@@ -135,6 +165,10 @@ namespace PaymentCalculation.PaymentCalculationConsole
                 {
                     Console.Write("Enter session's date: ");
                     DateTime date = Convert.ToDateTime(Console.ReadLine());
+                    if(currentWorker.Position == Position.Freelancer && (DateTime.Now.Date - date.Date) > new TimeSpan(2, 0, 0, 0))
+                    {
+                        throw new Exception("You can not enter a date earlier than 2 days from now.");
+                    }
                     Console.Write("Enter session's time gap: ");
                     byte gap = Convert.ToByte(Console.ReadLine());
                     Console.Write("Enter session's comment: ");
@@ -154,16 +188,11 @@ namespace PaymentCalculation.PaymentCalculationConsole
             }
         }
 
-        static void PrintWorkerReport()
+        static void PrintWorkerReport(string login)
         {
             try
             {
-                LoginInput:
-                Console.Write("Enter worker's login: ");
-                string login = Console.ReadLine();
                 Worker worker = storage.FindWorkerByLogin(login);
-                if (worker == null)
-                    goto LoginInput;
 
                 Console.Write("Enter start date of the report(not required): ");
                 DateTime? fromDate = null;
