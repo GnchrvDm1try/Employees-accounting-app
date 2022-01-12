@@ -13,12 +13,18 @@ namespace PaymentCalculation.PaymentCalculationConsole
 
         static void Login()
         {
-            Console.Write("Enter your login: ");
-            currentWorker = storage.FindWorkerByLogin(Console.ReadLine());
-            if (currentWorker != null)
-                Console.WriteLine(currentWorker.FirstName + " " + currentWorker.LastName + " - " + currentWorker.Position);
-            else
+            try
+            {
+                Console.Write("Enter your login: ");
+                currentWorker = storage.FindWorkerByLogin(Console.ReadLine(), false);
+                if (currentWorker != null)
+                    Console.WriteLine(currentWorker.FirstName + " " + currentWorker.LastName + " - " + currentWorker.Position);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Failed to login: {ex.Message}");
                 Login();
+            }
         }
 
         static void AvailableActions()
@@ -161,22 +167,20 @@ namespace PaymentCalculation.PaymentCalculationConsole
         {
             try
             {
-                if(storage.FindWorkerByLogin(login) != null)
+                storage.FindWorkerByLogin(login, false);
+                Console.Write("Enter session's date: ");
+                DateTime date = Convert.ToDateTime(Console.ReadLine());
+                if(currentWorker.Position == Position.Freelancer && (DateTime.Now.Date - date.Date) > new TimeSpan(2, 0, 0, 0))
                 {
-                    Console.Write("Enter session's date: ");
-                    DateTime date = Convert.ToDateTime(Console.ReadLine());
-                    if(currentWorker.Position == Position.Freelancer && (DateTime.Now.Date - date.Date) > new TimeSpan(2, 0, 0, 0))
-                    {
-                        throw new Exception("You can not enter a date earlier than 2 days from now.");
-                    }
-                    Console.Write("Enter session's time gap: ");
-                    byte gap = Convert.ToByte(Console.ReadLine());
-                    Console.Write("Enter session's comment: ");
-                    string comment = Console.ReadLine();
-                    WorkingSession session = new WorkingSession(login, date, gap, comment);
-                    storage.AddWorkingSession(session);
-                    Console.WriteLine("Added new session.");
+                    throw new Exception("You can not enter a date earlier than 2 days from now.");
                 }
+                Console.Write("Enter session's time gap: ");
+                byte gap = Convert.ToByte(Console.ReadLine());
+                Console.Write("Enter session's comment: ");
+                string comment = Console.ReadLine();
+                WorkingSession session = new WorkingSession(login, date, gap, comment);
+                storage.AddWorkingSession(session);
+                Console.WriteLine("Added new session.");
             }
             catch(Exception ex)
             {
@@ -192,7 +196,7 @@ namespace PaymentCalculation.PaymentCalculationConsole
         {
             try
             {
-                Worker worker = storage.FindWorkerByLogin(login);
+                Worker worker = storage.FindWorkerByLogin(login, false);
 
                 Console.Write("Enter start date of the report(not required): ");
                 DateTime? fromDate = null;
@@ -281,7 +285,7 @@ namespace PaymentCalculation.PaymentCalculationConsole
                             totalHours += allWorkingSessions[j].Gap;
                         }
                     }
-                    Worker worker = storage.FindWorkerByLogin(login);
+                    Worker worker = storage.FindWorkerByLogin(login, false);
                     totalPayment = worker.CalculatePayment(workerSessions);
                     Console.WriteLine($"{worker.FirstName} {worker.LastName} - {worker.Position}, worked {totalHours} hours, {totalPayment} to pay.");
                 }

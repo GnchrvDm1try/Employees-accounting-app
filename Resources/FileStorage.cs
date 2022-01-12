@@ -34,40 +34,33 @@ namespace PaymentCalculation.Resources
 
         public void AddWorker(Worker worker)
         {
-            try
+            if (FindWorkerByLogin(worker.Login, true) != null)
+                throw new Exception("User with this login already exists");
+            switch (worker.Position)
             {
-                if (FindWorkerByLogin(worker.Login) != null)
-                    throw new Exception("User with this login already exists");
-                switch (worker.Position)
-                {
-                    case Position.Supervisor:
-                        using (StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true))
-                        {
-                            Supervisor supervisor = (Supervisor)worker;
-                            supervisorsWriter.WriteLine(supervisor.Login + "," + supervisor.FirstName + "," + supervisor.LastName + "," + supervisor.Salary);
-                        }
-                        break;
-                    case Position.LocalEmployee:
-                        using (StreamWriter localEmployeesWriter = new StreamWriter(localEmployeesFilePath, true))
-                        {
-                            LocalEmployee localEmployee = (LocalEmployee)worker;
-                            localEmployeesWriter.WriteLine(localEmployee.Login + "," + localEmployee.FirstName + "," + localEmployee.LastName + "," + localEmployee.Salary);
-                        }
-                        break;
-                    case Position.Freelancer:
-                        using (StreamWriter freelancersWriter = new StreamWriter(freelancersFilePath, true))
-                        {
-                            Freelancer freelancer = (Freelancer)worker;
-                            freelancersWriter.WriteLine(freelancer.Login + "," + freelancer.FirstName + "," + freelancer.LastName + "," + freelancer.PaymentPerHour);
-                        }
-                        break;
-                    default:
-                        throw new Exception("Wrong type of user!");
-                }
-            }
-            catch(Exception ex)
-            {
-                
+                case Position.Supervisor:
+                    using (StreamWriter supervisorsWriter = new StreamWriter(supervisorsFilePath, true))
+                    {
+                        Supervisor supervisor = (Supervisor)worker;
+                        supervisorsWriter.WriteLine(supervisor.Login + "," + supervisor.FirstName + "," + supervisor.LastName + "," + supervisor.Salary);
+                    }
+                    break;
+                case Position.LocalEmployee:
+                    using (StreamWriter localEmployeesWriter = new StreamWriter(localEmployeesFilePath, true))
+                    {
+                        LocalEmployee localEmployee = (LocalEmployee)worker;
+                        localEmployeesWriter.WriteLine(localEmployee.Login + "," + localEmployee.FirstName + "," + localEmployee.LastName + "," + localEmployee.Salary);
+                    }
+                    break;
+                case Position.Freelancer:
+                    using (StreamWriter freelancersWriter = new StreamWriter(freelancersFilePath, true))
+                    {
+                        Freelancer freelancer = (Freelancer)worker;
+                        freelancersWriter.WriteLine(freelancer.Login + "," + freelancer.FirstName + "," + freelancer.LastName + "," + freelancer.PaymentPerHour);
+                    }
+                    break;
+                default:
+                    throw new Exception("Wrong type of user!");
             }
         }
 
@@ -82,52 +75,44 @@ namespace PaymentCalculation.Resources
         public List<WorkingSession> GetWorkingSessionsByLogin(string login, DateTime? fromDate = null, DateTime? toDate = null)
         {
             List<WorkingSession> workingSessions = new List<WorkingSession>();
-            try
+            using (StreamReader sessionsReader = new StreamReader(workingSessionsFilePath))
             {
-                using (StreamReader sessionsReader = new StreamReader(workingSessionsFilePath))
+                string line;
+                string[] parameters;
+
+                while ((line = sessionsReader.ReadLine()) != null)
                 {
-                    string line;
-                    string[] parameters;
+                    parameters = line.Split(',');
 
-                    while ((line = sessionsReader.ReadLine()) != null)
+                    DateTime date = Convert.ToDateTime(parameters[1]);
+                    byte gap = Convert.ToByte(parameters[2]);
+                    string comment = parameters[3];
+
+                    if (fromDate != null && toDate != null)
                     {
-                        parameters = line.Split(',');
-
-                        DateTime date = Convert.ToDateTime(parameters[1]);
-                        byte gap = Convert.ToByte(parameters[2]);
-                        string comment = parameters[3];
-
-                        if (fromDate != null && toDate != null)
+                        if (parameters[0] == login && fromDate <= date.Date && date.Date <= toDate)
                         {
-                            if (parameters[0] == login && fromDate <= date.Date && date.Date <= toDate)
-                            {
-                                WorkingSession session = new WorkingSession(login, date, gap, comment);
-                                workingSessions.Add(session);
-                            }
+                            WorkingSession session = new WorkingSession(login, date, gap, comment);
+                            workingSessions.Add(session);
                         }
-                        else if (fromDate != null && toDate == null)
+                    }
+                    else if (fromDate != null && toDate == null)
+                    {
+                        if (parameters[0] == login && fromDate <= date.Date && date.Date <= DateTime.Now.Date)
                         {
-                            if (parameters[0] == login && fromDate <= date.Date && date.Date <= DateTime.Now.Date)
-                            {
-                                WorkingSession session = new WorkingSession(login, date, gap, comment);
-                                workingSessions.Add(session);
-                            }
+                            WorkingSession session = new WorkingSession(login, date, gap, comment);
+                            workingSessions.Add(session);
                         }
-                        else
+                    }
+                    else
+                    {
+                        if(parameters[0] == login)
                         {
-                            if(parameters[0] == login)
-                            {
-                                WorkingSession session = new WorkingSession(login, date, gap, comment);
-                                workingSessions.Add(session);
-                            }
+                            WorkingSession session = new WorkingSession(login, date, gap, comment);
+                            workingSessions.Add(session);
                         }
                     }
                 }
-
-            }
-            catch(Exception ex)
-            {
-                
             }
             return workingSessions;
         }
@@ -175,12 +160,25 @@ namespace PaymentCalculation.Resources
             return workingSessions;
         }
 
-        public Worker FindWorkerByLogin(string login)
+        public Worker FindWorkerByLogin(string login, bool nullable)
         {
             Worker worker = null;
-            try
+            using (StreamReader streamReader = new StreamReader(supervisorsFilePath))
             {
-                using (StreamReader streamReader = new StreamReader(supervisorsFilePath))
+                string line;
+                while ((line = streamReader.ReadLine()) != null)
+                {
+                    string[] parameters = line.Split(',');
+                    if (parameters[0] == login)
+                    {
+                        worker = new Supervisor(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
+                        return worker;
+                    }
+                }
+            }
+            if (worker == null)
+            {
+                using (StreamReader streamReader = new StreamReader(localEmployeesFilePath))
                 {
                     string line;
                     while ((line = streamReader.ReadLine()) != null)
@@ -188,50 +186,32 @@ namespace PaymentCalculation.Resources
                         string[] parameters = line.Split(',');
                         if (parameters[0] == login)
                         {
-                            worker = new Supervisor(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
+                            worker = new LocalEmployee(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
                             return worker;
                         }
                     }
                 }
-                if (worker == null)
-                {
-                    using (StreamReader streamReader = new StreamReader(localEmployeesFilePath))
-                    {
-                        string line;
-                        while ((line = streamReader.ReadLine()) != null)
-                        {
-                            string[] parameters = line.Split(',');
-                            if (parameters[0] == login)
-                            {
-                                worker = new LocalEmployee(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
-                                return worker;
-                            }
-                        }
-                    }
-                }
-                if(worker == null)
-                {
-                    using (StreamReader streamReader = new StreamReader(freelancersFilePath))
-                    {
-                        string line;
-                        while((line = streamReader.ReadLine()) != null)
-                        {
-                            string[] parameters = line.Split(',');
-                            if(parameters[0] == login)
-                            {
-                                worker = new Freelancer(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
-                                return worker;
-                            }
-                        }
-                    }
-                }
-                throw new Exception("There is no worker with this login.");
             }
-            catch (Exception ex)
+            if(worker == null)
             {
-                Console.WriteLine($"Failed to find user: {ex.Message}");
+                using (StreamReader streamReader = new StreamReader(freelancersFilePath))
+                {
+                    string line;
+                    while((line = streamReader.ReadLine()) != null)
+                    {
+                        string[] parameters = line.Split(',');
+                        if(parameters[0] == login)
+                        {
+                            worker = new Freelancer(parameters[0], parameters[1], parameters[2], Convert.ToDecimal(parameters[3]));
+                            return worker;
+                        }
+                    }
+                }
             }
+        if (nullable == true)
             return worker;
+        else
+            throw new Exception("There is no worker with this login.");
         }
     }
 }

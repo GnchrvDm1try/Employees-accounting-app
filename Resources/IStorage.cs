@@ -14,7 +14,7 @@ namespace PaymentCalculation.Resources
 
         void AddWorkingSession(WorkingSession session);
 
-        Worker FindWorkerByLogin(string login);
+        Worker FindWorkerByLogin(string login, bool nullable);
 
         List<WorkingSession> GetWorkingSessionsByLogin(string name, DateTime? fromDate, DateTime? toDate);
 
