@@ -97,6 +97,11 @@ namespace PaymentCalculation.PaymentCalculationConsole
                     {
                         PrintWorkerReport(currentWorker.Login);
                     }
+                    else
+                    {
+                        Console.WriteLine("Enter correct number!");
+                        goto case Position.Freelancer;
+                    }
                     break;
             }
         }
@@ -170,12 +175,20 @@ namespace PaymentCalculation.PaymentCalculationConsole
                 storage.FindWorkerByLogin(login, false);
                 Console.Write("Enter session's date: ");
                 DateTime date = Convert.ToDateTime(Console.ReadLine());
+                if(date > DateTime.Now)
+                {
+                    throw new ArgumentOutOfRangeException("The date was in the future.");
+                }
                 if(currentWorker.Position == Position.Freelancer && (DateTime.Now.Date - date.Date) > new TimeSpan(2, 0, 0, 0))
                 {
-                    throw new Exception("You can not enter a date earlier than 2 days from now.");
+                    throw new ArgumentOutOfRangeException("You can not enter a date earlier than 2 days from now.");
                 }
                 Console.Write("Enter session's time gap: ");
                 byte gap = Convert.ToByte(Console.ReadLine());
+                if (0 > gap || gap > 24)
+                {
+                    throw new ArgumentOutOfRangeException("Time period must be between 0 and 24 hours per day.");
+                }
                 Console.Write("Enter session's comment: ");
                 string comment = Console.ReadLine();
                 WorkingSession session = new WorkingSession(login, date, gap, comment);
@@ -261,7 +274,7 @@ namespace PaymentCalculation.PaymentCalculationConsole
                 //String interpolation, which displays information about the employee and, depending on the dates values
                 Console.WriteLine($"Employees report " +
                     //uses ternary operator, that checks if the date is null and based on this builds the string value 
-                    $"{(fromDate == null ? "" : toDate == null ? $" for the period from {fromDate} to {DateTime.Now.Date.AddDays(1)}" : $" for the period from {fromDate} to {toDate}")}:");
+                    $"{(fromDate == null ? "" : toDate == null ? $" for the period from {fromDate} to {DateTime.Now.Date.AddDays(1).AddSeconds(-1)}" : $" for the period from {fromDate} to {toDate}")}:");
 
                 List<WorkingSession> allWorkingSessions = storage.GetAllWorkingSessions(fromDate, toDate);
                 List<WorkingSession> workerSessions = new List<WorkingSession>();
