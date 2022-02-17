@@ -16,7 +16,7 @@ namespace PaymentCalculation.Resources
 
         Worker FindWorkerByLogin(string login, bool nullable);
 
-        List<WorkingSession> GetWorkingSessionsByLogin(string name, DateTime? fromDate, DateTime? toDate);
+        List<WorkingSession> GetWorkingSessionsByLogin(string login, DateTime? fromDate, DateTime? toDate);
 
         List<WorkingSession> GetAllWorkingSessions(DateTime? fromDate, DateTime? toDate);
     }
