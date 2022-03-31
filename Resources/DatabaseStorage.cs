@@ -38,30 +38,6 @@ namespace PaymentCalculation.Resources
             }
         }
 
-        public async void Op()
-        {
-            try
-            {
-                await using var command = new NpgsqlCommand($"SELECT * FROM workers", connection);
-                await using var reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
-                {
-                    Console.Write(reader.GetString(0) + " ");
-                    Console.Write(reader.GetString(1) + " ");
-                    Console.Write(reader.GetString(2) + " ");
-                    Console.Write((Position)reader.GetInt16(3) + " ");
-                    Console.WriteLine(reader.GetDecimal(4));
-                }
-                connection.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-        }
-
         public void AddWorker(Worker worker)
         {
             string payment;
@@ -83,13 +59,16 @@ namespace PaymentCalculation.Resources
                     throw new Exception("Wrong type of user!");
             }
             NpgsqlCommand command = new NpgsqlCommand($"INSERT INTO workers(login, first_name, last_name, position_id, payment) " +
-                $"values(\'{worker.Login}\', \'{worker.FirstName}\', \'{worker.LastName}\', {(int)worker.Position}, {payment})", connection);
+                $"values('{worker.Login}', '{worker.FirstName}', '{worker.LastName}', {(int)worker.Position}, {payment})", connection);
             command.ExecuteNonQuery();
         }
 
         public void AddWorkingSession(WorkingSession session)
         {
-            throw new NotImplementedException();
+            string sqlCommand = $"INSERT INTO workingsessions(worker_login, date, gap, comment) " +
+                $"values('{session.Login}', '{session.Date}', {session.Gap}, '{session.Comment}')";
+            using NpgsqlCommand command = new NpgsqlCommand(sqlCommand, connection);
+            command.ExecuteNonQuery();
         }
 
         public Worker FindWorkerByLogin(string login, bool nullable)
@@ -116,18 +95,40 @@ namespace PaymentCalculation.Resources
 
         public List<WorkingSession> GetAllWorkingSessions(DateTime? fromDate, DateTime? toDate)
         {
-            throw new NotImplementedException();
-        }
-
-        public List<WorkingSession> GetWorkingSessionsByLogin(string name, DateTime? fromDate, DateTime? toDate)
-        {
-            using var command = new NpgsqlCommand("SELECT * FROM workers", connection);
+            List<WorkingSession> workingSessions = new List<WorkingSession>();
+            string sqlCommand = "SELECT * FROM workingsessions";
+            if(fromDate != null)
+            {
+                sqlCommand += $" WHERE date >= '{fromDate}'";
+                if (toDate != null)
+                    sqlCommand += $" AND date <= '{toDate}'";
+            }
+            using var command = new NpgsqlCommand(sqlCommand, connection);
             using var reader = command.ExecuteReader();
             while(reader.Read())
             {
-
+                workingSessions.Add(new WorkingSession(reader.GetString(0), reader.GetDateTime(1), reader.GetByte(2), reader.GetString(3)));
             }
-            throw new NotImplementedException();
+            return workingSessions;
+        }
+
+        public List<WorkingSession> GetWorkingSessionsByLogin(string login, DateTime? fromDate, DateTime? toDate)
+        {
+            List<WorkingSession> workingSessions = new List<WorkingSession>();
+            string sqlCommand = $"SELECT * FROM workingsessions WHERE worker_login = '{login}'";
+            if (fromDate != null)
+            {
+                sqlCommand += $" AND date >= '{fromDate}'";
+                if (toDate != null)
+                    sqlCommand += $" AND date <= '{toDate}'";
+            }
+            using var command = new NpgsqlCommand(sqlCommand, connection);
+            using var reader = command.ExecuteReader();
+            while(reader.Read())
+            {
+                workingSessions.Add(new WorkingSession(reader.GetString(0), reader.GetDateTime(1), reader.GetByte(2), reader.GetString(3)));
+            }
+            return workingSessions;
         }
     }
 }
