@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using Npgsql;
 using System.Collections.Generic;
 using PaymentCalculation.Model;
 using PaymentCalculation.Resources;
@@ -8,7 +10,7 @@ namespace PaymentCalculation.PaymentCalculationConsole
 {
     class Program
     {
-        static FileStorage storage = new FileStorage();
+        static DatabaseStorage storage = new DatabaseStorage();
         static Worker currentWorker = null;
 
         static void Login()

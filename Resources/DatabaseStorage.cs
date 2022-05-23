@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Configuration;
 using PaymentCalculation.Model;
@@ -16,26 +15,12 @@ namespace PaymentCalculation.Resources
         public DatabaseStorage()
         {
             connection.ConnectionString = connectionString;
-            try
-            {
-                connection.Open();
-            }
-            catch
-            {
-                Console.WriteLine("Failed to connect to the db");
-            }
+            connection.Open();
         }
 
         ~DatabaseStorage()
         {
-            try
-            {
-                connection.Close();
-            }
-            catch
-            {
-                Console.WriteLine("Failed to disconnect from the db");
-            }
+            connection.Close();
         }
 
         public void AddWorker(Worker worker)
@@ -58,8 +43,9 @@ namespace PaymentCalculation.Resources
                 default:
                     throw new Exception("Wrong type of user!");
             }
-            NpgsqlCommand command = new NpgsqlCommand($"INSERT INTO workers(login, first_name, last_name, position_id, payment) " +
-                $"values('{worker.Login}', '{worker.FirstName}', '{worker.LastName}', {(int)worker.Position}, {payment})", connection);
+            string sqlCommand = $"INSERT INTO workers(login, first_name, last_name, position_id, payment) " +
+                $"values('{worker.Login}', '{worker.FirstName}', '{worker.LastName}', {(int)worker.Position}, {payment})";
+            NpgsqlCommand command = new NpgsqlCommand(sqlCommand, connection);
             command.ExecuteNonQuery();
         }
 
@@ -74,7 +60,8 @@ namespace PaymentCalculation.Resources
         public Worker FindWorkerByLogin(string login, bool nullable)
         {
             Worker worker = null;
-            using NpgsqlCommand command = new NpgsqlCommand($"SELECT * FROM workers WHERE login = '{login}'", connection);
+            string sqlCommand = $"SELECT * FROM workers WHERE login = '{login}'";
+            using NpgsqlCommand command = new NpgsqlCommand(sqlCommand, connection);
             using NpgsqlDataReader reader = command.ExecuteReader();
             reader.Read();
             if (reader.IsOnRow)
@@ -126,7 +113,7 @@ namespace PaymentCalculation.Resources
             using var reader = command.ExecuteReader();
             while(reader.Read())
             {
-                workingSessions.Add(new WorkingSession(reader.GetString(0), reader.GetDateTime(1), reader.GetByte(2), reader.GetString(3)));
+                workingSessions.Add(new WorkingSession(reader.GetString(1), reader.GetDateTime(2), reader.GetByte(3), reader.GetString(4)));
             }
             return workingSessions;
         }
